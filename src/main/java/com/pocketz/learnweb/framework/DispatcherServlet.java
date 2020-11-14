@@ -58,10 +58,10 @@ public class DispatcherServlet extends HttpServlet {
 	private void scanInController(RequestType type) throws ServletException {
 //		 enum
 //		switch (type) {
-//		case "get":
+//		case GET:
 //
 //			break;
-//		case "post":
+//		case POST:
 //
 //			break;
 //		default:
@@ -127,19 +127,25 @@ public class DispatcherServlet extends HttpServlet {
 								}
 							}
 						}
-						if (type.equals("post")) {
-							String path = method.getAnnotation(PostMapping.class).value();
-							logger.info("Found POST: {} => {}", path, method);
-							this.postMappings.put(path, new PostDispatcher(controllerInstance, method,
-									method.getParameterTypes(), objectMapper));
-						} else {
+						String path = null;
+						switch (type) {
+						case GET:				
 							String[] parameterNames = Arrays.stream(method.getParameters()).map(p -> p.getName())
-									.toArray(String[]::new);
-
-							String path = method.getAnnotation(GetMapping.class).value();
+							.toArray(String[]::new);
+							
+							path = method.getAnnotation(GetMapping.class).value();
 							logger.info("Found GET: {} => {}", path, method);
 							this.getMappings.put(path, new GetDispatcher(controllerInstance, method, parameterNames,
 									method.getParameterTypes()));
+							break;
+						case POST:				
+							path = method.getAnnotation(PostMapping.class).value();
+							logger.info("Found POST: {} => {}", path, method);
+							this.postMappings.put(path, new PostDispatcher(controllerInstance, method,
+									method.getParameterTypes(), objectMapper));
+							break;
+						default:
+							break;
 						}
 					} else {
 //							logger.error("Annotation is null in {}",method.getName());
