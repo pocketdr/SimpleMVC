@@ -42,8 +42,8 @@ public class DispatcherServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		scanInController("get");
-		scanInController("post");
+		scanInController(RequestType.GET);
+		scanInController(RequestType.POST);
 		this.viewEngine = new ViewEngine(getServletContext());
 		for (String key: getMappings.keySet()) {
 			System.out.println(key);
@@ -55,7 +55,7 @@ public class DispatcherServlet extends HttpServlet {
 		}
 	}
 
-	private void scanInController(String type) throws ServletException {
+	private void scanInController(RequestType type) throws ServletException {
 //		 enum
 //		switch (type) {
 //		case "get":
@@ -78,10 +78,10 @@ public class DispatcherServlet extends HttpServlet {
 					boolean annotationNotNull = false;
 					boolean parameterNotSpt = false;
 					switch (type) {
-					case "get":
+					case GET:
 						annotationNotNull = (method.getAnnotation(GetMapping.class) != null);
 						break;
-					case "post":
+					case POST:
 						annotationNotNull = (method.getAnnotation(PostMapping.class) != null);
 						break;
 					default:
@@ -97,10 +97,10 @@ public class DispatcherServlet extends HttpServlet {
 						Class<?> requestBodyClass = null;
 						for (Class<?> parameterClass : method.getParameterTypes()) {
 							switch (type) {
-							case "get":
+							case GET:
 								parameterNotSpt = !supportedGetParameterTypes.contains(parameterClass);
 								break;
-							case "post":
+							case POST:
 								parameterNotSpt = !supportedPostParameterTypes.contains(parameterClass);
 								break;
 							default:
@@ -109,11 +109,11 @@ public class DispatcherServlet extends HttpServlet {
 							}
 							if (parameterNotSpt) {
 								switch (type) {
-								case "get":
+								case GET:
 									throw new UnsupportedOperationException(
 											"Unsupported parameter type: " + parameterClass + " for method: " + method);
 //										break;
-								case "post":
+								case POST:
 									if (requestBodyClass == null) {
 										// post
 									} else {
