@@ -222,13 +222,11 @@ public class DispatcherServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		logger.info("a get request");
 		process(req, resp, this.getMappings);
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		logger.info("a post request");
 		process(req, resp, this.postMappings);
 	}
 
@@ -239,7 +237,6 @@ public class DispatcherServlet extends HttpServlet {
 		resp.setCharacterEncoding("UTF-8");
 		logger.info(req.getRequestURI());
 		String path = req.getRequestURI().substring(req.getContextPath().length());
-		logger.info("a request for {}", path);
 		AbstractDispatcher dispatcher = dispatcherMap.get(path);
 		System.out.println(dispatcher);
 		if (dispatcher == null) {
