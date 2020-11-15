@@ -235,10 +235,8 @@ public class DispatcherServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		resp.setContentType("text/html");
 		resp.setCharacterEncoding("UTF-8");
-		logger.info(req.getRequestURI());
 		String path = req.getRequestURI().substring(req.getContextPath().length());
 		AbstractDispatcher dispatcher = dispatcherMap.get(path);
-		System.out.println(dispatcher);
 		if (dispatcher == null) {
 			resp.sendError(404);
 			return;
