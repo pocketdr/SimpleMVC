@@ -42,8 +42,8 @@ public class DispatcherServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		scanInController("get");
-		scanInController("post");
+		scanInController(RequestType.GET);
+		scanInController(RequestType.POST);
 		this.viewEngine = new ViewEngine(getServletContext());
 		for (String key: getMappings.keySet()) {
 			System.out.println(key);
@@ -55,13 +55,13 @@ public class DispatcherServlet extends HttpServlet {
 		}
 	}
 
-	private void scanInController(String type) throws ServletException {
+	private void scanInController(RequestType type) throws ServletException {
 //		 enum
 //		switch (type) {
-//		case "get":
+//		case GET:
 //
 //			break;
-//		case "post":
+//		case POST:
 //
 //			break;
 //		default:
@@ -78,10 +78,10 @@ public class DispatcherServlet extends HttpServlet {
 					boolean annotationNotNull = false;
 					boolean parameterNotSpt = false;
 					switch (type) {
-					case "get":
+					case GET:
 						annotationNotNull = (method.getAnnotation(GetMapping.class) != null);
 						break;
-					case "post":
+					case POST:
 						annotationNotNull = (method.getAnnotation(PostMapping.class) != null);
 						break;
 					default:
@@ -97,10 +97,10 @@ public class DispatcherServlet extends HttpServlet {
 						Class<?> requestBodyClass = null;
 						for (Class<?> parameterClass : method.getParameterTypes()) {
 							switch (type) {
-							case "get":
+							case GET:
 								parameterNotSpt = !supportedGetParameterTypes.contains(parameterClass);
 								break;
-							case "post":
+							case POST:
 								parameterNotSpt = !supportedPostParameterTypes.contains(parameterClass);
 								break;
 							default:
@@ -109,11 +109,11 @@ public class DispatcherServlet extends HttpServlet {
 							}
 							if (parameterNotSpt) {
 								switch (type) {
-								case "get":
+								case GET:
 									throw new UnsupportedOperationException(
 											"Unsupported parameter type: " + parameterClass + " for method: " + method);
 //										break;
-								case "post":
+								case POST:
 									if (requestBodyClass == null) {
 										// post
 									} else {
@@ -127,19 +127,25 @@ public class DispatcherServlet extends HttpServlet {
 								}
 							}
 						}
-						if (type.equals("post")) {
-							String path = method.getAnnotation(PostMapping.class).value();
-							logger.info("Found POST: {} => {}", path, method);
-							this.postMappings.put(path, new PostDispatcher(controllerInstance, method,
-									method.getParameterTypes(), objectMapper));
-						} else {
+						String path = null;
+						switch (type) {
+						case GET:				
 							String[] parameterNames = Arrays.stream(method.getParameters()).map(p -> p.getName())
-									.toArray(String[]::new);
-
-							String path = method.getAnnotation(GetMapping.class).value();
+							.toArray(String[]::new);
+							
+							path = method.getAnnotation(GetMapping.class).value();
 							logger.info("Found GET: {} => {}", path, method);
 							this.getMappings.put(path, new GetDispatcher(controllerInstance, method, parameterNames,
 									method.getParameterTypes()));
+							break;
+						case POST:				
+							path = method.getAnnotation(PostMapping.class).value();
+							logger.info("Found POST: {} => {}", path, method);
+							this.postMappings.put(path, new PostDispatcher(controllerInstance, method,
+									method.getParameterTypes(), objectMapper));
+							break;
+						default:
+							break;
 						}
 					} else {
 //							logger.error("Annotation is null in {}",method.getName());
@@ -216,13 +222,11 @@ public class DispatcherServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		logger.info("a get request");
 		process(req, resp, this.getMappings);
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		logger.info("a post request");
 		process(req, resp, this.postMappings);
 	}
 
@@ -231,11 +235,8 @@ public class DispatcherServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		resp.setContentType("text/html");
 		resp.setCharacterEncoding("UTF-8");
-		logger.info(req.getRequestURI());
 		String path = req.getRequestURI().substring(req.getContextPath().length());
-		logger.info("a request for {}", path);
 		AbstractDispatcher dispatcher = dispatcherMap.get(path);
-		System.out.println(dispatcher);
 		if (dispatcher == null) {
 			resp.sendError(404);
 			return;
