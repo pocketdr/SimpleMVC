@@ -17,7 +17,6 @@ public class UploadServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		InputStream input = req.getInputStream();
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		byte[] buffer = new byte[1024];
@@ -28,6 +27,7 @@ public class UploadServlet extends HttpServlet {
 			}
 			output.write(buffer,0,len);
 		}
+		//TODO: version10
 		String uploadedText = output.toString(StandardCharsets.UTF_8);
 		PrintWriter pw = resp.getWriter();
 		pw.write("<h1>Uploaded:<h1>");

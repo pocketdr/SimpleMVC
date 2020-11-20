@@ -24,6 +24,7 @@ class CachedHttpServletResponse extends HttpServletResponseWrapper {
 			throw new IllegalStateException("Cannot re-open writer!");
 		}
 		open = true;
+		//TODO version10
 		return new PrintWriter(output, false, StandardCharsets.UTF_8);
 	}
 
