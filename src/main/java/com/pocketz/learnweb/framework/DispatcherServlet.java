@@ -26,6 +26,7 @@ import com.pocketz.learnweb.controller.UserController;
 
 @WebServlet(urlPatterns = "/")
 public class DispatcherServlet extends HttpServlet {
+	//TODO version9
 	private static final Set<Class<?>> supportedGetParameterTypes = Set.of(int.class, long.class, boolean.class,
 			String.class, HttpServletRequest.class, HttpServletResponse.class, HttpSession.class);
 	private static final Set<Class<?>> supportedPostParameterTypes = Set.of(HttpServletRequest.class,
@@ -37,7 +38,8 @@ public class DispatcherServlet extends HttpServlet {
 	private Map<String, PostDispatcher> postMappings = new HashMap<>();
 
 	private ViewEngine viewEngine;
-
+	
+	//TODO version9
 	private List<Class<?>> controllers = List.of(IndexController.class, UserController.class);
 
 	@Override
@@ -153,7 +155,6 @@ public class DispatcherServlet extends HttpServlet {
 
 				}
 			} catch (ReflectiveOperationException e) {
-				// TODO: handle exception
 				throw new ServletException(e);
 			}
 		}
@@ -232,7 +233,6 @@ public class DispatcherServlet extends HttpServlet {
 
 	protected void process(HttpServletRequest req, HttpServletResponse resp,
 			Map<String, ? extends AbstractDispatcher> dispatcherMap) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		resp.setContentType("text/html");
 		resp.setCharacterEncoding("UTF-8");
 		String path = req.getRequestURI().substring(req.getContextPath().length());
